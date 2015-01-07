@@ -18,8 +18,8 @@ public class AppsGridViewAdapter extends ArrayAdapter<ResolveInfo> {
     LayoutInflater mInflater;
     int mResource;
 
-    public AppsGridViewAdapter(Context context, int resource, List<ResolveInfo> objects) {
-        super(context, resource, objects);
+    public AppsGridViewAdapter(Context context, int resource) {
+        super(context, resource);
         mContext = context;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mResource = resource;
@@ -37,5 +37,12 @@ public class AppsGridViewAdapter extends ArrayAdapter<ResolveInfo> {
         tv.setText(ri.loadLabel(mContext.getPackageManager()));
         iv.setImageDrawable(ri.loadIcon(mContext.getPackageManager()));
         return v;
+    }
+
+    public void setData(List<ResolveInfo> data) {
+        clear();
+        if (data != null) {
+            addAll(data);
+        }
     }
 }

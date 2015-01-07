@@ -13,15 +13,25 @@ public class StatisticTable {
 
     private static final String DATABASE_CREATE = "create table "
             + TABLE_NAME
-            + "("
+            + " ("
             + COLUMN_ID + " integer primary key autoincrement, "
-            + COLUMN_PACKAGE_NAME + " text not null, "
+            + COLUMN_PACKAGE_NAME + " text not null unique, "
             + COLUMN_USAGE + " integer not null, "
             + COLUMN_IGNORE + " integer not null"
             + ");";
+    private static final String IGNORE_MRUAPPS_PACKAGE = "insert into "
+            + TABLE_NAME
+            + " (" + COLUMN_PACKAGE_NAME + ", "
+            + COLUMN_USAGE + ", "
+            + COLUMN_IGNORE + ")"
+            + " values "
+            + "('" + MainActivity.MRUAPPS_PACKAGE_NAME + "', "
+            + "'" + 0 + "', "
+            + "'" + 1 + "');";
 
     public static void onCreate(SQLiteDatabase database) {
         database.execSQL(DATABASE_CREATE);
+        database.execSQL(IGNORE_MRUAPPS_PACKAGE);
     }
 
     public static void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
