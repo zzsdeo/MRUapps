@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Часто используемые приложения</string>
     <string name="icon">icon</string>
+    <string name="ignore">Исключить из списка</string>
+    <string name="selected">Выбрано:</string>
+    <string name="ignored_list">Список исключенных</string>
 </resources>

@@ -17,10 +17,14 @@
 
         </activity>
 
+        <activity
+            android:name=".IgnoredAppsActivity"
+            android:label="@string/ignored_list" />
+
         <provider
             android:authorities="ru.zzsdeo.mruapps.contentprovider"
             android:name=".DBContentProvider"
-            android:exported="false">
+            android:exported="true">
         </provider>
 
         <receiver

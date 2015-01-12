@@ -13,8 +13,8 @@ import java.util.List;
 
 public class AppsCollection {
 
-    Context mContext;
-    PackageManager pm;
+    private Context mContext;
+    private PackageManager pm;
 
     public AppsCollection (Context context) {
         mContext = context;
@@ -54,5 +54,36 @@ public class AppsCollection {
 
         MRUActivities.addAll(activities);
         return MRUActivities;
+    }
+
+    public List<ResolveInfo> getIgnoredApps () {
+        Intent startupIntent = new Intent(Intent.ACTION_MAIN);
+        startupIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        List<ResolveInfo> activities = pm.queryIntentActivities(startupIntent, 0);
+
+        Cursor c = mContext.getContentResolver().query(DBContentProvider.CONTENT_URI, new String[]{StatisticTable.COLUMN_PACKAGE_NAME}, StatisticTable.COLUMN_IGNORE + " = " + 1, null, null);
+        List<ResolveInfo> ignoredActivities = new ArrayList<ResolveInfo>();
+
+        if (c.moveToFirst()) {
+            do {
+                for (int i = 0; i < activities.size(); i++) {
+                    if (activities.get(i).activityInfo.applicationInfo.packageName.equals(c.getString(c.getColumnIndex(StatisticTable.COLUMN_PACKAGE_NAME)))) {
+                        ignoredActivities.add(activities.get(i));
+                    }
+                }
+            } while (c.moveToNext());
+        }
+        c.close();
+
+        Collections.sort(ignoredActivities, new Comparator<ResolveInfo>() {
+            @Override
+            public int compare(ResolveInfo resolveInfo, ResolveInfo resolveInfo2) {
+                return String.CASE_INSENSITIVE_ORDER.compare(
+                        resolveInfo.loadLabel(pm).toString(),
+                        resolveInfo2.loadLabel(pm).toString());
+            }
+        });
+
+        return ignoredActivities;
     }
 }

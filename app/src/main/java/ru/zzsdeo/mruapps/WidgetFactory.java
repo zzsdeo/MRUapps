@@ -1,56 +1,63 @@
 package ru.zzsdeo.mruapps;
 
-import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import java.util.List;
+
 public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
 
-    Context mContext;
-    Cursor mCursor;
-    int mAppWidgetId;
+    private Context mContext;
+    private List<ResolveInfo> mMRUapps;
+    private AppsCollection apps;
+    private static final int ICON_WIDTH = 100;
+    private static final int ICON_HEIGHT = 100;
+    //private int mAppWidgetId;
 
     public WidgetFactory (Context context, Intent intent) {
         mContext = context;
-        mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+        apps = new AppsCollection(context);
+        //mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
     }
 
     @Override
     public void onCreate() {
-        //mCursor = mContext.getContentResolver().query(DBContentProvider.CONTENT_URI, new String[] {StatisticTable.COLUMN_ID, StatisticTable.COLUMN_APP_NAME, StatisticTable.COLUMN_APP_ICON}, null, null, StatisticTable.COLUMN_USAGE + " DESC");
+        mMRUapps = apps.getMRUapps();
     }
 
     @Override
     public void onDataSetChanged() {
-
+        mMRUapps.clear();
+        mMRUapps.addAll(apps.getMRUapps());
     }
 
     @Override
     public void onDestroy() {
-        mCursor.close();
+        mMRUapps.clear();
     }
 
     @Override
     public int getCount() {
-        return mCursor.getCount();
+        return mMRUapps.size();
     }
 
     @Override
     public RemoteViews getViewAt(int i) {
-        if (mCursor.moveToPosition(i)) {
-            RemoteViews rView = new RemoteViews(mContext.getPackageName(), R.layout.grid_item);
-            //rView.setTextViewText(R.id.name, mCursor.getString(mCursor.getColumnIndex(StatisticTable.COLUMN_APP_NAME)));
-            //rView.setImageViewResource(R.id.icon, mCursor.getInt(mCursor.getColumnIndex(StatisticTable.COLUMN_APP_ICON)));
-            return rView;
-        } else {
-            return null;
-        }
+        RemoteViews rView = new RemoteViews(mContext.getPackageName(), R.layout.grid_item);
+        rView.setTextViewText(R.id.name, mMRUapps.get(i).loadLabel(mContext.getPackageManager()));
+        rView.setImageViewBitmap(R.id.icon, Utils.convertToBitmap(mMRUapps.get(i).loadIcon(mContext.getPackageManager()), ICON_WIDTH, ICON_HEIGHT));
+
+        Bundle extras = new Bundle();
+        extras.putInt(Widget.EXTRA_ITEM, i);
+        Intent fillInIntent = new Intent();
+        fillInIntent.putExtras(extras);
+        rView.setOnClickFillInIntent(R.id.gridItemId, fillInIntent);
+
+        return rView;
     }
 
     @Override
@@ -65,11 +72,7 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public long getItemId(int i) {
-        if (mCursor.moveToPosition(i)) {
-            return mCursor.getLong(mCursor.getColumnIndex(StatisticTable.COLUMN_ID));
-        } else {
-            return 0;
-        }
+        return i;
     }
 
     @Override

@@ -14,12 +14,14 @@ import java.util.List;
 
 public class AppsGridViewAdapter extends ArrayAdapter<ResolveInfo> {
 
-    Context mContext;
-    LayoutInflater mInflater;
-    int mResource;
+    private Context mContext;
+    private LayoutInflater mInflater;
+    private int mResource;
+    private static final int ICON_WIDTH = 100;
+    private static final int ICON_HEIGHT = 100;
 
-    public AppsGridViewAdapter(Context context, int resource) {
-        super(context, resource);
+    public AppsGridViewAdapter(Context context, int resource, List<ResolveInfo> objects) {
+        super(context, resource, objects);
         mContext = context;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mResource = resource;
@@ -35,14 +37,12 @@ public class AppsGridViewAdapter extends ArrayAdapter<ResolveInfo> {
         ImageView iv = (ImageView) v.findViewById(R.id.icon);
         ResolveInfo ri = getItem(position);
         tv.setText(ri.loadLabel(mContext.getPackageManager()));
-        iv.setImageDrawable(ri.loadIcon(mContext.getPackageManager()));
+        iv.setImageBitmap(Utils.convertToBitmap(ri.loadIcon(mContext.getPackageManager()), ICON_WIDTH, ICON_HEIGHT));
         return v;
     }
 
-    public void setData(List<ResolveInfo> data) {
-        clear();
-        if (data != null) {
-            addAll(data);
-        }
+    @Override
+    public boolean hasStableIds() {
+        return true;
     }
 }
