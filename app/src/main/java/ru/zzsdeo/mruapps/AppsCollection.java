@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.util.Log;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,6 +18,8 @@ public class AppsCollection {
 
     private Context mContext;
     private PackageManager pm;
+    private static final int ICON_WIDTH = 100;
+    private static final int ICON_HEIGHT = 100;
 
     public AppsCollection (Context context) {
         mContext = context;
@@ -86,5 +90,29 @@ public class AppsCollection {
         });
 
         return ignoredActivities;
+    }
+
+    public List<AppsNamesAndIcons> getAppsNamesAndIcons () {
+        List<ResolveInfo> mruApps = getMRUapps();
+        List<AppsNamesAndIcons> listAppsNamesAndIcons = new ArrayList<AppsNamesAndIcons>();
+        for (ResolveInfo ri : mruApps) {
+            AppsNamesAndIcons appsNamesAndIcons = new AppsNamesAndIcons();
+            appsNamesAndIcons.setName(ri.loadLabel(pm).toString());
+            appsNamesAndIcons.setIcon(Utils.convertToBitmap(ri.loadIcon(pm), ICON_WIDTH, ICON_HEIGHT));
+            listAppsNamesAndIcons.add(appsNamesAndIcons);
+        }
+        return listAppsNamesAndIcons;
+    }
+
+    public List<AppsNamesAndIcons> getIgnoredAppsNamesAndIcons () {
+        List<ResolveInfo> ignoredApps = getIgnoredApps();
+        List<AppsNamesAndIcons> listAppsNamesAndIcons = new ArrayList<AppsNamesAndIcons>();
+        for (ResolveInfo ri : ignoredApps) {
+            AppsNamesAndIcons appsNamesAndIcons = new AppsNamesAndIcons();
+            appsNamesAndIcons.setName(ri.loadLabel(pm).toString());
+            appsNamesAndIcons.setIcon(Utils.convertToBitmap(ri.loadIcon(pm), ICON_WIDTH, ICON_HEIGHT));
+            listAppsNamesAndIcons.add(appsNamesAndIcons);
+        }
+        return listAppsNamesAndIcons;
     }
 }

@@ -5,9 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
+import android.util.LruCache;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,13 +30,14 @@ public class MainActivity extends Activity {
     public static final String PARCELABLE_EXTRA = "parcelable_extra";
     private GridView gView;
     private List<ResolveInfo> mruApps;
+    private List<AppsNamesAndIcons> mruAppsNamesAndIcons;
     public static final String RECEIVER_EXTRA = "receiver_extra";
+    private LruCache<String, Bitmap> mMemoryCache;
 
     @Override
     protected void onStart() {
         super.onStart();
-        mruApps = apps.getMRUapps();
-        fillData(mruApps);
+        refreshGridView();
     }
 
     @Override
@@ -66,11 +69,21 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        final int cacheSize = maxMemory / 8;
+        mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
+            @Override
+            protected int sizeOf(String key, Bitmap bitmap) {
+                return bitmap.getByteCount() / 1024;
+            }
+        };
+
         MRUAPPS_PACKAGE_NAME = getPackageName();
 
         apps = new AppsCollection(getApplicationContext());
         mruApps = apps.getMRUapps();
-        gView = fillData(mruApps);
+        mruAppsNamesAndIcons = apps.getAppsNamesAndIcons();
+        gView = fillData(mruAppsNamesAndIcons);
         gView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -138,16 +151,21 @@ public class MainActivity extends Activity {
 
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
-            mruApps = apps.getMRUapps();
-            fillData(mruApps);
+            refreshGridView();
         }
     }
 
-    private GridView fillData (List<ResolveInfo> MRUActivities) {
+    private GridView fillData (List<AppsNamesAndIcons> appsNamesAndIcons) {
         GridView gv = (GridView) findViewById(R.id.gridView);
-        AppsGridViewAdapter adapter = new AppsGridViewAdapter(this, R.layout.grid_item, MRUActivities);
+        AppsGridViewAdapter adapter = new AppsGridViewAdapter(this, R.layout.grid_item, appsNamesAndIcons);
         gv.setAdapter(adapter);
         return gv;
+    }
+
+    private void refreshGridView () {
+        mruApps = apps.getMRUapps();
+        mruAppsNamesAndIcons = apps.getAppsNamesAndIcons();
+        fillData(mruAppsNamesAndIcons);
     }
 
     public void startActivityAndUpdateDB (ActivityInfo activityInfo, Context context) {
@@ -160,5 +178,15 @@ public class MainActivity extends Activity {
         serviceIntent.setAction(DBUpdateIntentService.LAUNCH_ACTION);
         serviceIntent.putExtra(PARCELABLE_EXTRA, activityInfo);
         context.startService(serviceIntent);
+    }
+
+    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+        if (getBitmapFromMemCache(key) == null) {
+            mMemoryCache.put(key, bitmap);
+        }
+    }
+
+    public Bitmap getBitmapFromMemCache(String key) {
+        return mMemoryCache.get(key);
     }
 }

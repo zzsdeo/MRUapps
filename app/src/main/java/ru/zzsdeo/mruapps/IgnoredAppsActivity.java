@@ -23,14 +23,8 @@ public class IgnoredAppsActivity extends Activity {
     public static final String IGNORED_PARCELABLE_EXTRA = "ignored_parcelable_extra";
     private GridView gView;
     private List<ResolveInfo> ignoredApps;
+    private List<AppsNamesAndIcons> ignoredAppsNamesAndIcons;
     public static final String IGNORED_RECEIVER_EXTRA = "ignored_receiver_extra";
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        ignoredApps = apps.getIgnoredApps();
-        fillData(ignoredApps);
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -56,7 +50,8 @@ public class IgnoredAppsActivity extends Activity {
 
         apps = new AppsCollection(getApplicationContext());
         ignoredApps = apps.getIgnoredApps();
-        gView = fillData(ignoredApps);
+        ignoredAppsNamesAndIcons = apps.getIgnoredAppsNamesAndIcons();
+        gView = fillData(ignoredAppsNamesAndIcons);
         gView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
         gView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             @Override
@@ -116,13 +111,14 @@ public class IgnoredAppsActivity extends Activity {
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
             ignoredApps = apps.getIgnoredApps();
-            fillData(ignoredApps);
+            ignoredAppsNamesAndIcons = apps.getIgnoredAppsNamesAndIcons();
+            fillData(ignoredAppsNamesAndIcons);
         }
     }
 
-    private GridView fillData (List<ResolveInfo> activities) {
+    private GridView fillData (List<AppsNamesAndIcons> appsNamesAndIcons) {
         GridView gv = (GridView) findViewById(R.id.gridView);
-        AppsGridViewAdapter adapter = new AppsGridViewAdapter(this, R.layout.grid_item, activities);
+        AppsGridViewAdapter adapter = new AppsGridViewAdapter(this, R.layout.grid_item, appsNamesAndIcons);
         gv.setAdapter(adapter);
         return gv;
     }
