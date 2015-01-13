@@ -8,9 +8,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
-import android.os.Bundle;
 import android.os.ResultReceiver;
-import android.provider.SyncStateContract;
 
 import java.util.List;
 

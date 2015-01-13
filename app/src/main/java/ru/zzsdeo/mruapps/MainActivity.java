@@ -8,8 +8,6 @@ import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
-import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,6 +35,12 @@ public class MainActivity extends Activity {
         super.onStart();
         mruApps = apps.getMRUapps();
         fillData(mruApps);
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        super.onBackPressed();
     }
 
     @Override
