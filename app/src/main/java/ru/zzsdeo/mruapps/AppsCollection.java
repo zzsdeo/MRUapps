@@ -5,8 +5,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.os.Environment;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -86,5 +92,72 @@ public class AppsCollection {
         });
 
         return ignoredActivities;
+    }
+
+    public void createCache () {
+        Intent startupIntent = new Intent(Intent.ACTION_MAIN);
+        startupIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        List<ResolveInfo> activities = pm.queryIntentActivities(startupIntent, 0);
+
+        /*try {
+            File sd = Environment.getExternalStorageDirectory();
+            File data = Environment.getDataDirectory();
+
+            if (sd.canWrite()) {
+                String currentDBPath = "//data//" + "ru.zzsdeo.mymoneybalance"
+                        + "//databases//" + "myDB";
+                String backupDBPath = "/MyMoneyBalance/database/myDB";
+                File currentDB = new File(data, currentDBPath);
+                File backupDB = new File(sd, backupDBPath);
+
+                FileChannel src = new FileInputStream(currentDB).getChannel();
+                FileChannel dst = new FileOutputStream(backupDB).getChannel();
+                dst.transferFrom(src, 0, src.size());
+                src.close();
+                dst.close();
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "База данных успешно экспортирована", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        } catch (final Exception e) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(), "Ошибка!\n" + e.toString(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }*/
+
+
+
+        String file_path = Environment.getDataDirectory().getAbsolutePath() +
+                "/icon_cache";
+        File dir = new File(file_path);
+        String filename = activities.get(1).activityInfo.applicationInfo.packageName;
+        Bitmap bitmap = Utils.convertToBitmap(activities.get(1).loadIcon(pm), 100, 100);
+
+        if(!dir.exists())
+            dir.mkdirs();
+        File file = new File(dir, filename+".png");
+        FileOutputStream fOut = null;
+        try {
+            fOut = new FileOutputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        bitmap.compress(Bitmap.CompressFormat.PNG, 85, fOut);
+        try {
+            if (fOut != null) {
+                fOut.flush();
+                fOut.close();
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

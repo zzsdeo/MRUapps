@@ -69,6 +69,7 @@ public class MainActivity extends Activity {
         MRUAPPS_PACKAGE_NAME = getPackageName();
 
         apps = new AppsCollection(getApplicationContext());
+        apps.createCache();
         mruApps = apps.getMRUapps();
         gView = fillData(mruApps);
         gView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
