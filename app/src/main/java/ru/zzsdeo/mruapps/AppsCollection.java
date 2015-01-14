@@ -5,14 +5,19 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.util.Log;
+import android.util.LruCache;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class AppsCollection {
 
@@ -20,10 +25,22 @@ public class AppsCollection {
     private PackageManager pm;
     private static final int ICON_WIDTH = 100;
     private static final int ICON_HEIGHT = 100;
+    private LruCache<String, Bitmap> mMemoryCache;
+    private Set<String> inProgressSet = Collections.synchronizedSet(new HashSet<String>());
+
 
     public AppsCollection (Context context) {
         mContext = context;
         pm = context.getPackageManager();
+
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        final int cacheSize = maxMemory / 8;
+        mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
+            @Override
+            protected int sizeOf(String key, Bitmap bitmap) {
+                return bitmap.getByteCount() / 1024;
+            }
+        };
     }
 
     public List<ResolveInfo> getMRUapps () {
@@ -109,10 +126,61 @@ public class AppsCollection {
         List<AppsNamesAndIcons> listAppsNamesAndIcons = new ArrayList<AppsNamesAndIcons>();
         for (ResolveInfo ri : ignoredApps) {
             AppsNamesAndIcons appsNamesAndIcons = new AppsNamesAndIcons();
-            appsNamesAndIcons.setName(ri.loadLabel(pm).toString());
-            appsNamesAndIcons.setIcon(Utils.convertToBitmap(ri.loadIcon(pm), ICON_WIDTH, ICON_HEIGHT));
+            String name = ri.loadLabel(pm).toString();
+            appsNamesAndIcons.setName(name);
+            Bitmap icon = getBitmapFromMemCache(name);
+            if (icon != null) {
+                appsNamesAndIcons.setIcon(icon);
+            } else {
+                new BitmapWorkerTask(name, appsNamesAndIcons, ri).execute();
+            }
             listAppsNamesAndIcons.add(appsNamesAndIcons);
         }
         return listAppsNamesAndIcons;
+    }
+
+    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+        if (getBitmapFromMemCache(key) == null) {
+            mMemoryCache.put(key, bitmap);
+        }
+    }
+
+    public Bitmap getBitmapFromMemCache(String key) {
+        return mMemoryCache.get(key);
+    }
+
+    class BitmapWorkerTask extends AsyncTask<Void, Void, Bitmap> {
+
+        private String name;
+        private AppsNamesAndIcons appsNamesAndIcons;
+        private ResolveInfo ri;
+
+        BitmapWorkerTask(String name, AppsNamesAndIcons appsNamesAndIcons, ResolveInfo ri) {
+            this.name = name;
+            this.appsNamesAndIcons = appsNamesAndIcons;
+            this.ri = ri;
+        }
+
+        @Override
+        protected Bitmap doInBackground(Void... params) {
+            if (inProgressSet.contains(name)) {
+                return null;
+            }
+            Bitmap fromMemoryCache = getBitmapFromMemCache(name);
+            if (fromMemoryCache != null) {
+                return fromMemoryCache;
+            }
+            inProgressSet.add(name);
+            return Utils.convertToBitmap(ri.loadIcon(pm), ICON_WIDTH, ICON_HEIGHT);
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+            if (bitmap == null) return;
+            inProgressSet.remove(name);
+            addBitmapToMemoryCache(name, bitmap);
+            appsNamesAndIcons.setIcon(bitmap);
+        }
     }
 }

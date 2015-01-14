@@ -58,15 +58,4 @@ public class AppsGridViewAdapter extends ArrayAdapter<AppsNamesAndIcons> {
         public ImageView imageView;
         public TextView textView;
     }
-
-    class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
-
-        @Override
-        protected Bitmap doInBackground(String... strings) {
-            MainActivity ma = new MainActivity();
-            final Bitmap bitmap = mObjects.get(position).getIcon();
-            ma.addBitmapToMemoryCache(String.valueOf(integers[0]), bitmap);
-            return bitmap;
-        }
-    }
 }
