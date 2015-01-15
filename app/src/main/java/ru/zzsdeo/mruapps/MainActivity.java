@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.view.ActionMode;
@@ -17,6 +19,10 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,7 +75,6 @@ public class MainActivity extends Activity {
         MRUAPPS_PACKAGE_NAME = getPackageName();
 
         apps = new AppsCollection(getApplicationContext());
-        apps.createCache();
         mruApps = apps.getMRUapps();
         gView = fillData(mruApps);
         gView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
