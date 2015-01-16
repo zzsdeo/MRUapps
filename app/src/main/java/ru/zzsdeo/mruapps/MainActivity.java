@@ -1,11 +1,16 @@
 package ru.zzsdeo.mruapps;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -18,6 +23,7 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -35,6 +41,7 @@ public class MainActivity extends Activity {
     private GridView gView;
     private List<ResolveInfo> mruApps;
     public static final String RECEIVER_EXTRA = "receiver_extra";
+    private static final String VERSION_NAME_PREF_KEY = "version_name";
 
     @Override
     protected void onStart() {
@@ -73,6 +80,18 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         MRUAPPS_PACKAGE_NAME = getPackageName();
+
+        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+
+        try {
+            PackageInfo packageInfo = getPackageManager().getPackageInfo(MRUAPPS_PACKAGE_NAME, 0);
+            String versionName = packageInfo.versionName;
+            if (!preferences.getString(VERSION_NAME_PREF_KEY, "").equals(versionName)) {
+                new CreateIconCacheAsyncTask(getApplicationContext()).execute();
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
 
         apps = new AppsCollection(getApplicationContext());
         mruApps = apps.getMRUapps();
@@ -146,6 +165,52 @@ public class MainActivity extends Activity {
         protected void onReceiveResult(int resultCode, Bundle resultData) {
             mruApps = apps.getMRUapps();
             fillData(mruApps);
+        }
+    }
+
+    class CreateIconCacheAsyncTask extends AsyncTask<Void, Integer, Void> {
+
+        private ProgressDialog progressBar;
+        private Context context;
+        private int i;
+
+        public CreateIconCacheAsyncTask (Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progressBar = new ProgressDialog(context);
+            progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressBar.setIndeterminate(true);
+            progressBar.setTitle(R.string.creating_icon_cache);
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... option) {
+            progressBar.setMessage(context.getString(R.string.added) + " " + option[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            progressBar.dismiss();
+            int sum = i - 1;
+            Toast.makeText(context, context.getString(R.string.added) + " " + sum, Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... unused) {
+            progressBar.show();
+            Intent startupIntent = new Intent(Intent.ACTION_MAIN);
+            startupIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+            List<ResolveInfo> activities = context.getPackageManager().queryIntentActivities(startupIntent, 0);
+            i = 1;
+            for (ResolveInfo ri : activities) {
+                Utils.createIconFile(context, ri);
+                publishProgress(i);
+                i++;
+            }
+            return null;
         }
     }
 
