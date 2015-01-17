@@ -1,27 +1,13 @@
 package ru.zzsdeo.mruapps;
 
-import android.app.Activity;
-import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.widget.ImageView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import com.squareup.picasso.Picasso;
-
-import java.io.File;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
 
@@ -61,15 +47,7 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
     public RemoteViews getViewAt(int i) {
         RemoteViews rView = new RemoteViews(mContext.getPackageName(), R.layout.grid_item);
         rView.setTextViewText(R.id.name, mMRUapps.get(i).loadLabel(mContext.getPackageManager()));
-
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        String path = new File(mContext.getCacheDir(), mMRUapps.get(i).activityInfo.applicationInfo.packageName).getAbsolutePath();
-        Bitmap icon = BitmapFactory.decodeFile(path, options);
-        if (icon == null) {
-            icon = Utils.convertToBitmap(mMRUapps.get(i).loadIcon(mContext.getPackageManager()), Utils.ICON_WIDTH, Utils.ICON_HEIGHT);
-        }
-        rView.setImageViewBitmap(R.id.icon, icon);
+        rView.setImageViewBitmap(R.id.icon, Utils.convertToBitmap(mMRUapps.get(i).loadIcon(mContext.getPackageManager()), Utils.ICON_WIDTH, Utils.ICON_HEIGHT));
 
         Bundle extras = new Bundle();
         extras.putInt(Widget.EXTRA_ITEM, i);

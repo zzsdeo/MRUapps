@@ -4,6 +4,5 @@
     <string name="ignore">Исключить из списка</string>
     <string name="selected">Выбрано:</string>
     <string name="ignored_list">Список исключенных</string>
-    <string name="added">Добавлено:</string>
     <string name="creating_icon_cache">Создание кэша иконок</string>
 </resources>

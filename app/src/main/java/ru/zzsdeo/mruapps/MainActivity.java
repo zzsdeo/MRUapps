@@ -9,10 +9,8 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.view.ActionMode;
@@ -23,12 +21,7 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,12 +41,6 @@ public class MainActivity extends Activity {
         super.onStart();
         mruApps = apps.getMRUapps();
         fillData(mruApps);
-    }
-
-    @Override
-    public void onBackPressed() {
-
-        super.onBackPressed();
     }
 
     @Override
@@ -81,13 +68,13 @@ public class MainActivity extends Activity {
 
         MRUAPPS_PACKAGE_NAME = getPackageName();
 
-        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
-
         try {
             PackageInfo packageInfo = getPackageManager().getPackageInfo(MRUAPPS_PACKAGE_NAME, 0);
             String versionName = packageInfo.versionName;
+            SharedPreferences preferences = getPreferences(MODE_PRIVATE);
             if (!preferences.getString(VERSION_NAME_PREF_KEY, "").equals(versionName)) {
-                new CreateIconCacheAsyncTask(getApplicationContext()).execute();
+                new CreateIconCacheAsyncTask(this).execute();
+                preferences.edit().putString(VERSION_NAME_PREF_KEY, versionName).apply();
             }
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -172,7 +159,6 @@ public class MainActivity extends Activity {
 
         private ProgressDialog progressBar;
         private Context context;
-        private int i;
 
         public CreateIconCacheAsyncTask (Context context) {
             this.context = context;
@@ -181,30 +167,28 @@ public class MainActivity extends Activity {
         @Override
         protected void onPreExecute() {
             progressBar = new ProgressDialog(context);
-            progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progressBar.setIndeterminate(true);
+            progressBar.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             progressBar.setTitle(R.string.creating_icon_cache);
+            progressBar.show();
         }
 
         @Override
         protected void onProgressUpdate(Integer... option) {
-            progressBar.setMessage(context.getString(R.string.added) + " " + option[0]);
+            progressBar.setProgress(option[0]);
         }
 
         @Override
         protected void onPostExecute(Void unused) {
             progressBar.dismiss();
-            int sum = i - 1;
-            Toast.makeText(context, context.getString(R.string.added) + " " + sum, Toast.LENGTH_LONG).show();
         }
 
         @Override
         protected Void doInBackground(Void... unused) {
-            progressBar.show();
             Intent startupIntent = new Intent(Intent.ACTION_MAIN);
             startupIntent.addCategory(Intent.CATEGORY_LAUNCHER);
             List<ResolveInfo> activities = context.getPackageManager().queryIntentActivities(startupIntent, 0);
-            i = 1;
+            progressBar.setMax(activities.size());
+            int i = 1;
             for (ResolveInfo ri : activities) {
                 Utils.createIconFile(context, ri);
                 publishProgress(i);

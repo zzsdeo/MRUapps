@@ -40,12 +40,14 @@ public class Widget extends AppWidgetProvider {
             rv.setRemoteAdapter(R.id.wgtGridView, intent);
 
             Intent clickIntent = new Intent(context, Widget.class);
+            clickIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             clickIntent.setAction(CLICK_ACTION);
             clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
             PendingIntent clickPendingIntent = PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             rv.setPendingIntentTemplate(R.id.wgtGridView, clickPendingIntent);
 
             Intent mruAppIntent = new Intent(context, MainActivity.class);
+            mruAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             mruAppIntent.setAction(MRU_APP_ACTION);
             mruAppIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
             PendingIntent mruAppPendingIntent = PendingIntent.getActivity(context, appWidgetId, mruAppIntent, 0);
