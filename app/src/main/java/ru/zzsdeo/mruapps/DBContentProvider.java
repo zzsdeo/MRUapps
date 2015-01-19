@@ -172,6 +172,7 @@ public class DBContentProvider extends ContentProvider {
         String[] available = {
                 StatisticTable.COLUMN_ID,
                 StatisticTable.COLUMN_PACKAGE_NAME,
+                StatisticTable.COLUMN_APP_NAME,
                 StatisticTable.COLUMN_USAGE,
                 StatisticTable.COLUMN_IGNORE
         };

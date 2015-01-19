@@ -1,8 +1,6 @@
 <resources>
     <string name="app_name">Часто используемые приложения</string>
     <string name="icon">icon</string>
-    <string name="ignore">Исключить из списка</string>
-    <string name="selected">Выбрано:</string>
-    <string name="ignored_list">Список исключенных</string>
-    <string name="creating_icon_cache">Создание кэша иконок</string>
+    <string name="updating_apps_list">Обновление списка приложений</string>
+    <string name="chose_apps">Выбор приложений</string>
 </resources>

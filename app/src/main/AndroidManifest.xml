@@ -9,20 +9,8 @@
         <!--activities******************************************************************-->
 
         <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name">
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
-        </activity>
-
-        <activity
-            android:name=".IgnoredAppsActivity"
-            android:label="@string/ignored_list" />
+            android:name=".ChoseAppsActivity"
+            android:label="@string/chose_apps"/>
 
         <!--providers******************************************************************-->
 
