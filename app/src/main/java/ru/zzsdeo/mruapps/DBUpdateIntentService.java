@@ -27,7 +27,7 @@ public class DBUpdateIntentService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        if (intent.getAction().equals(LAUNCH_ACTION)) {
+        /*if (intent.getAction().equals(LAUNCH_ACTION)) {
             ActivityInfo activityInfo = intent.getParcelableExtra(MainActivity.PARCELABLE_EXTRA);
 
             Cursor c = getContentResolver().query(DBContentProvider.CONTENT_URI, new String[]{StatisticTable.COLUMN_USAGE}, StatisticTable.COLUMN_PACKAGE_NAME + " like '" + activityInfo.applicationInfo.packageName + "'", null, null);
@@ -96,6 +96,6 @@ public class DBUpdateIntentService extends IntentService {
         int ids[] = appWidgetManager.getAppWidgetIds(thisAppWidget);
         for (int appWidgetID : ids) {
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetID, R.id.wgtGridView);
-        }
+        }*/
     }
 }

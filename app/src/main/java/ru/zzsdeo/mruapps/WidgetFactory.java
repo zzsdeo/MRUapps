@@ -13,24 +13,22 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
 
     private Context mContext;
     private List<ResolveInfo> mMRUapps;
-    private AppsCollection apps;
     //private int mAppWidgetId;
 
     public WidgetFactory (Context context, Intent intent) {
         mContext = context;
-        apps = new AppsCollection(context);
         //mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
     }
 
     @Override
     public void onCreate() {
-        mMRUapps = apps.getMRUapps();
+        //mMRUapps = apps.getMRUapps();
     }
 
     @Override
     public void onDataSetChanged() {
         mMRUapps.clear();
-        mMRUapps.addAll(apps.getMRUapps());
+        //mMRUapps.addAll(apps.getMRUapps());
     }
 
     @Override
@@ -45,17 +43,18 @@ public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public RemoteViews getViewAt(int i) {
-        RemoteViews rView = new RemoteViews(mContext.getPackageName(), R.layout.grid_item);
-        rView.setTextViewText(R.id.name, mMRUapps.get(i).loadLabel(mContext.getPackageManager()));
-        rView.setImageViewBitmap(R.id.icon, Utils.convertToBitmap(mMRUapps.get(i).loadIcon(mContext.getPackageManager()), Utils.ICON_WIDTH, Utils.ICON_HEIGHT));
+        //RemoteViews rView = new RemoteViews(mContext.getPackageName(), R.layout.grid_item);
+        //rView.setTextViewText(R.id.name, mMRUapps.get(i).loadLabel(mContext.getPackageManager()));
+        //rView.setImageViewBitmap(R.id.icon, Utils.convertToBitmap(mMRUapps.get(i).loadIcon(mContext.getPackageManager()), Utils.ICON_WIDTH, Utils.ICON_HEIGHT));
 
         Bundle extras = new Bundle();
         extras.putInt(Widget.EXTRA_ITEM, i);
         Intent fillInIntent = new Intent();
         fillInIntent.putExtras(extras);
-        rView.setOnClickFillInIntent(R.id.gridItemId, fillInIntent);
+        //rView.setOnClickFillInIntent(R.id.gridItemId, fillInIntent);
 
-        return rView;
+        //return rView;
+        return  null;
     }
 
     @Override

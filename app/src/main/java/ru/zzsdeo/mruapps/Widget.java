@@ -18,20 +18,20 @@ public class Widget extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
 
-        if (intent.getAction().equals(CLICK_ACTION)) {
+        /*if (intent.getAction().equals(CLICK_ACTION)) {
             //int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
             int viewIndex = intent.getIntExtra(EXTRA_ITEM, 0);
             AppsCollection apps = new AppsCollection(context);
             MainActivity ma = new MainActivity();
             ma.startActivityAndUpdateDB(apps.getMRUapps().get(viewIndex).activityInfo, context);
-        }
+        }*/
     }
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
 
-        for (int appWidgetId : appWidgetIds) {
+        /*for (int appWidgetId : appWidgetIds) {
             Intent intent = new Intent(context, WidgetService.class);
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
             intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
@@ -54,6 +54,6 @@ public class Widget extends AppWidgetProvider {
             rv.setOnClickPendingIntent(R.id.wgtImageButton, mruAppPendingIntent);
 
             appWidgetManager.updateAppWidget(appWidgetId, rv);
-        }
+        }*/
     }
 }
