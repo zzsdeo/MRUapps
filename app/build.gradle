@@ -21,5 +21,4 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile project(':picasso-2.4.0')
 }

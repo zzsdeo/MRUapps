@@ -50,7 +50,7 @@ public class ListViewAdapter extends CursorAdapter {
                     } else {
                         values.put(StatisticTable.COLUMN_IGNORE, 1);
                     }
-                    context.getContentResolver().update(DBContentProvider.CONTENT_URI, values, "_id = " + obj, null);
+                    context.getContentResolver().update(DBContentProvider.CONTENT_URI, values, StatisticTable.COLUMN_ID + " = " + obj, null);
                     values.clear();
                 }
             }
