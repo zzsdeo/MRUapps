@@ -3,8 +3,6 @@ package ru.zzsdeo.mruapps;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.text.SpannableStringBuilder;
-import android.text.style.StrikethroughSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

@@ -15,12 +15,10 @@ import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ListView;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class ChoseAppsActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -38,14 +36,15 @@ public class ChoseAppsActivity extends Activity implements LoaderManager.LoaderC
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onStop() {
+        super.onStop();
+
         ComponentName thisAppWidget = new ComponentName(getApplicationContext(), Widget.class);
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
         int ids[] = appWidgetManager.getAppWidgetIds(thisAppWidget);
         for (int appWidgetID : ids) {
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetID, R.id.wgtGridView);
         }
-        super.onDestroy();
     }
 
     @Override

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -66,7 +65,9 @@ public class AppsCollection {
                     } else if (c.getInt(c.getColumnIndex(StatisticTable.COLUMN_USAGE)) > c2.getInt(c2.getColumnIndex(StatisticTable.COLUMN_USAGE))) {
                         k = -1;
                     } else {
-                        k = 0;
+                        String label = resolveInfo.loadLabel(pm).toString();
+                        String label2 = resolveInfo2.loadLabel(pm).toString();
+                        k = label.compareTo(label2);
                     }
                 }
                 c.close();

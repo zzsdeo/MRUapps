@@ -37,6 +37,17 @@
             </meta-data>
         </receiver>
 
+        <receiver android:name=".DeletePackageReceiver">
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.PACKAGE_REMOVED">
+                </action>
+                <data
+                    android:scheme="package">
+                </data>
+            </intent-filter>
+        </receiver>
+
         <!--services******************************************************************-->
 
         <service
