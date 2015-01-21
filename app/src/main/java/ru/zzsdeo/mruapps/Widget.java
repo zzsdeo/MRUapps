@@ -5,8 +5,11 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.widget.RemoteViews;
+
+import java.util.List;
 
 public class Widget extends AppWidgetProvider {
 
@@ -23,16 +26,16 @@ public class Widget extends AppWidgetProvider {
             //int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
             int viewIndex = intent.getIntExtra(EXTRA_ITEM, 0);
             AppsCollection apps = new AppsCollection(context);
-
+            List<ResolveInfo> mruApps = apps.getMRUapps();
 
             Intent launchIntent = new Intent(Intent.ACTION_MAIN);
-            launchIntent.setClassName(apps.getMRUapps().get(viewIndex).activityInfo.applicationInfo.packageName, apps.getMRUapps().get(viewIndex).activityInfo.name);
+            launchIntent.setClassName(mruApps.get(viewIndex).activityInfo.applicationInfo.packageName, mruApps.get(viewIndex).activityInfo.name);
             launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(launchIntent);
 
             Intent serviceIntent = new Intent(context, DBUpdateIntentService.class);
             serviceIntent.setAction(DBUpdateIntentService.LAUNCH_ACTION);
-            serviceIntent.putExtra(PARCELABLE_EXTRA, apps.getMRUapps().get(viewIndex));
+            serviceIntent.putExtra(PARCELABLE_EXTRA, mruApps.get(viewIndex));
             context.startService(serviceIntent);
         }
     }
