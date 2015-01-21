@@ -13,7 +13,7 @@ public class Widget extends AppWidgetProvider {
     public static final String CLICK_ACTION = "click_action";
     public static final String EXTRA_ITEM = "extra_item";
     public static final String SETTINGS_ACTION = "settings_action";
-    public static final String PARCELABLE_EXTRA = "parcelable_extra";
+    public static final String VIEW_INDEX_EXTRA = "view_index_extra";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -22,7 +22,10 @@ public class Widget extends AppWidgetProvider {
         if (intent.getAction().equals(CLICK_ACTION)) {
             //int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
             int viewIndex = intent.getIntExtra(EXTRA_ITEM, 0);
-            AppsCollection apps = new AppsCollection(context);
+            Intent serviceIntent = new Intent(context, LaunchAppIntentService.class);
+            serviceIntent.putExtra(VIEW_INDEX_EXTRA, viewIndex);
+            context.startService(serviceIntent);
+            /*AppsCollection apps = new AppsCollection(context);
 
 
             Intent launchIntent = new Intent(Intent.ACTION_MAIN);
@@ -33,7 +36,7 @@ public class Widget extends AppWidgetProvider {
             Intent serviceIntent = new Intent(context, DBUpdateIntentService.class);
             serviceIntent.setAction(DBUpdateIntentService.LAUNCH_ACTION);
             serviceIntent.putExtra(PARCELABLE_EXTRA, apps.getMRUapps().get(viewIndex));
-            context.startService(serviceIntent);
+            context.startService(serviceIntent);*/
         }
     }
 

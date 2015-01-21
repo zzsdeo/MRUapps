@@ -58,6 +58,10 @@
         <service
             android:name=".DBUpdateIntentService">
         </service>
+
+        <service
+            android:name=".LaunchAppIntentService">
+        </service>
     </application>
 
 </manifest>

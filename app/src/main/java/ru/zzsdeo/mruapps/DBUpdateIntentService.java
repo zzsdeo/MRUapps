@@ -22,7 +22,7 @@ public class DBUpdateIntentService extends IntentService {
     protected void onHandleIntent(Intent intent) {
 
         if (intent.getAction().equals(LAUNCH_ACTION)) {
-            ResolveInfo appInfo = intent.getParcelableExtra(Widget.PARCELABLE_EXTRA);
+            ResolveInfo appInfo = intent.getParcelableExtra(LaunchAppIntentService.PARCELABLE_EXTRA);
 
             Cursor c = getContentResolver().query(DBContentProvider.CONTENT_URI, new String[]{StatisticTable.COLUMN_USAGE,
                     StatisticTable.COLUMN_ID},
