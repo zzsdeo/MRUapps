@@ -91,7 +91,8 @@ public class ChoseAppsActivity extends Activity implements LoaderManager.LoaderC
         protected void onPreExecute() {
             progressBar = new ProgressDialog(context);
             progressBar.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            progressBar.setTitle(R.string.updating_apps_list);
+            progressBar.setTitle(R.string.loading);
+            progressBar.setMessage(getString(R.string.updating_apps_list));
             progressBar.show();
         }
 

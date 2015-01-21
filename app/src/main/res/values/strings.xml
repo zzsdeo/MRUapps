@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Часто используемые приложения</string>
-    <string name="icon">icon</string>
+    <string name="icon">Иконка приложения</string>
+    <string name="loading">Загрузка…</string>
     <string name="updating_apps_list">Обновление списка приложений</string>
     <string name="chose_apps">Выбор приложений</string>
 </resources>

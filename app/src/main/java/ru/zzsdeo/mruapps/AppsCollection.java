@@ -5,10 +5,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 public class AppsCollection {
@@ -76,5 +78,32 @@ public class AppsCollection {
             }
         });
         return MRUActivities;
+    }
+
+    public HashMap<Long, Drawable> getAppIcons () {
+        HashMap<Long, Drawable> listOfIcons = new HashMap<Long, Drawable>();
+        Intent startupIntent = new Intent(Intent.ACTION_MAIN);
+        startupIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        List<ResolveInfo> activities = pm.queryIntentActivities(startupIntent, 0);
+
+        Cursor c = mContext.getContentResolver().query(DBContentProvider.CONTENT_URI, new String[] {
+                StatisticTable.COLUMN_ID,
+                StatisticTable.COLUMN_PACKAGE_NAME,
+                StatisticTable.COLUMN_APP_NAME},
+                null, null, null);
+        if (c.moveToFirst()) {
+            do {
+                for (int i = 0; i < activities.size(); i++) {
+                    if (activities.get(i).activityInfo.applicationInfo.packageName.equals(c.getString(c.getColumnIndex(StatisticTable.COLUMN_PACKAGE_NAME))) &
+                            activities.get(i).loadLabel(pm).toString().equals(c.getString(c.getColumnIndex(StatisticTable.COLUMN_APP_NAME)))) {
+                        listOfIcons.put(c.getLong(c.getColumnIndex(StatisticTable.COLUMN_ID)), activities.get(i).loadIcon(pm));
+                        activities.remove(i);
+                    }
+                }
+            } while (c.moveToNext());
+        }
+        c.close();
+
+        return listOfIcons;
     }
 }

@@ -3,20 +3,27 @@ package ru.zzsdeo.mruapps;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CursorAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.util.HashMap;
 
 public class ListViewAdapter extends CursorAdapter {
 
     private LayoutInflater mInflater;
+    private HashMap<Long, Drawable> icons;
 
     public ListViewAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        AppsCollection apps = new AppsCollection(context);
+        icons = apps.getAppIcons();
     }
 
     @Override
@@ -26,9 +33,11 @@ public class ListViewAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, final Context context, Cursor cursor) {
+        ImageView iv = (ImageView) view.findViewById(R.id.imageViewItem);
         TextView tv = (TextView) view.findViewById(R.id.item);
         final CheckBox cb = (CheckBox) view.findViewById(R.id.checkBoxItem);
 
+        iv.setImageDrawable(icons.get(cursor.getLong(cursor.getColumnIndex(StatisticTable.COLUMN_ID))));
         tv.setText(cursor.getString(cursor.getColumnIndex(StatisticTable.COLUMN_APP_NAME)));
         if (cursor.getInt(cursor.getColumnIndex(StatisticTable.COLUMN_IGNORE)) == 0) {
             cb.setChecked(true);
