@@ -103,7 +103,6 @@ public class AppsCollection {
             } while (c.moveToNext());
         }
         c.close();
-
         return listOfIcons;
     }
 }

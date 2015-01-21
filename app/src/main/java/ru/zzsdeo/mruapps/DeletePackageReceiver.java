@@ -10,9 +10,11 @@ public class DeletePackageReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Intent i = new Intent(context, DBUpdateIntentService.class);
-        i.putExtra(PACKAGE_NAME_EXTRA, intent.getData().getSchemeSpecificPart());
-        i.setAction(DBUpdateIntentService.DELETE_PACKAGE_ACTION);
-        context.startService(i);
+        if (!intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)) {
+            Intent i = new Intent(context, DBUpdateIntentService.class);
+            i.putExtra(PACKAGE_NAME_EXTRA, intent.getData().getSchemeSpecificPart());
+            i.setAction(DBUpdateIntentService.DELETE_PACKAGE_ACTION);
+            context.startService(i);
+        }
     }
 }
