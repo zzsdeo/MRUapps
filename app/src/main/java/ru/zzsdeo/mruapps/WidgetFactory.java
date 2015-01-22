@@ -3,51 +3,63 @@ package ru.zzsdeo.mruapps;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import java.io.File;
 import java.util.List;
 
 public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
 
     private Context mContext;
-    private List<ResolveInfo> mMRUapps;
-    private AppsCollection apps;
+    private Cursor mCursor;
     //private int mAppWidgetId;
 
     public WidgetFactory (Context context, Intent intent) {
         mContext = context;
-        apps = new AppsCollection(context);
         //mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
     }
 
     @Override
     public void onCreate() {
-        mMRUapps = apps.getMRUapps();
+        mCursor = mContext.getContentResolver().query(DBContentProvider.CONTENT_URI, new String []
+                {StatisticTable.COLUMN_ACTIVITY_NAME,
+                StatisticTable.COLUMN_APP_NAME},
+                StatisticTable.COLUMN_IGNORE + " = " + 0,
+                null, StatisticTable.COLUMN_USAGE + " DESC, " + StatisticTable.COLUMN_APP_NAME);
     }
 
     @Override
     public void onDataSetChanged() {
-        mMRUapps.clear();
-        mMRUapps.addAll(apps.getMRUapps());
+        mCursor.close();
+        mCursor = mContext.getContentResolver().query(DBContentProvider.CONTENT_URI, new String []
+                {StatisticTable.COLUMN_ACTIVITY_NAME,
+                StatisticTable.COLUMN_APP_NAME},
+                StatisticTable.COLUMN_IGNORE + " = " + 0,
+                null, StatisticTable.COLUMN_USAGE + " DESC, " + StatisticTable.COLUMN_APP_NAME);
     }
 
     @Override
     public void onDestroy() {
-        mMRUapps.clear();
+        mCursor.close();
     }
 
     @Override
     public int getCount() {
-        return mMRUapps.size();
+        return mCursor.getCount();
     }
 
     @Override
     public RemoteViews getViewAt(int i) {
         RemoteViews rView = new RemoteViews(mContext.getPackageName(), R.layout.grid_item);
-        rView.setTextViewText(R.id.name, mMRUapps.get(i).loadLabel(mContext.getPackageManager()));
-        rView.setImageViewBitmap(R.id.icon, Utils.convertToBitmap(mMRUapps.get(i).loadIcon(mContext.getPackageManager()), Utils.ICON_WIDTH, Utils.ICON_HEIGHT));
+        if (mCursor.moveToPosition(i)) {
+            rView.setTextViewText(R.id.name, mCursor.getString(mCursor.getColumnIndex(StatisticTable.COLUMN_APP_NAME)));
+            rView.setImageViewBitmap(R.id.icon, Utils.getIcon(mContext, mCursor.getString(mCursor.getColumnIndex(StatisticTable.COLUMN_ACTIVITY_NAME))));
+        }
 
         Bundle extras = new Bundle();
         extras.putInt(Widget.EXTRA_ITEM, i);

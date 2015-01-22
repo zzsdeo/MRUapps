@@ -8,6 +8,7 @@ public class StatisticTable {
     public static final String TABLE_NAME = "statistic";
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_PACKAGE_NAME = "package_name";
+    public static final String COLUMN_ACTIVITY_NAME = "activity_name";
     public static final String COLUMN_APP_NAME = "app_name";
     public static final String COLUMN_USAGE = "usage";
     public static final String COLUMN_IGNORE = "ignore";
@@ -17,6 +18,7 @@ public class StatisticTable {
             + " ("
             + COLUMN_ID + " integer primary key autoincrement, "
             + COLUMN_PACKAGE_NAME + " text not null, "
+            + COLUMN_ACTIVITY_NAME + " text not null, "
             + COLUMN_APP_NAME + " text not null, "
             + COLUMN_USAGE + " integer not null, "
             + COLUMN_IGNORE + " integer not null"

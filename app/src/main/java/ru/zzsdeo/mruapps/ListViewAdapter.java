@@ -17,13 +17,10 @@ import java.util.HashMap;
 public class ListViewAdapter extends CursorAdapter {
 
     private LayoutInflater mInflater;
-    private HashMap<Long, Drawable> icons;
 
     public ListViewAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        AppsCollection apps = new AppsCollection(context);
-        icons = apps.getAppIcons();
     }
 
     @Override
@@ -37,7 +34,7 @@ public class ListViewAdapter extends CursorAdapter {
         TextView tv = (TextView) view.findViewById(R.id.item);
         final CheckBox cb = (CheckBox) view.findViewById(R.id.checkBoxItem);
 
-        iv.setImageDrawable(icons.get(cursor.getLong(cursor.getColumnIndex(StatisticTable.COLUMN_ID))));
+        iv.setImageBitmap(Utils.getIcon(context, cursor.getString(cursor.getColumnIndex(StatisticTable.COLUMN_ACTIVITY_NAME))));
         tv.setText(cursor.getString(cursor.getColumnIndex(StatisticTable.COLUMN_APP_NAME)));
         if (cursor.getInt(cursor.getColumnIndex(StatisticTable.COLUMN_IGNORE)) == 0) {
             cb.setChecked(true);

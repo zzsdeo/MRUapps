@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
 import android.net.Uri;
 import android.widget.RemoteViews;
 
@@ -16,7 +17,6 @@ public class Widget extends AppWidgetProvider {
     public static final String CLICK_ACTION = "click_action";
     public static final String EXTRA_ITEM = "extra_item";
     public static final String SETTINGS_ACTION = "settings_action";
-    public static final String PARCELABLE_EXTRA = "parcelable_extra";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -25,17 +25,10 @@ public class Widget extends AppWidgetProvider {
         if (intent.getAction().equals(CLICK_ACTION)) {
             //int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
             int viewIndex = intent.getIntExtra(EXTRA_ITEM, 0);
-            AppsCollection apps = new AppsCollection(context);
-            List<ResolveInfo> mruApps = apps.getMRUapps();
-
-            Intent launchIntent = new Intent(Intent.ACTION_MAIN);
-            launchIntent.setClassName(mruApps.get(viewIndex).activityInfo.applicationInfo.packageName, mruApps.get(viewIndex).activityInfo.name);
-            launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(launchIntent);
 
             Intent serviceIntent = new Intent(context, DBUpdateIntentService.class);
             serviceIntent.setAction(DBUpdateIntentService.LAUNCH_ACTION);
-            serviceIntent.putExtra(PARCELABLE_EXTRA, mruApps.get(viewIndex));
+            serviceIntent.putExtra(EXTRA_ITEM, viewIndex);
             context.startService(serviceIntent);
         }
     }

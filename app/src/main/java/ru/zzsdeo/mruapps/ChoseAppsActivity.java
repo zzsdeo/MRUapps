@@ -13,11 +13,14 @@ import android.content.Intent;
 import android.content.Loader;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.ListView;
 
+import java.io.File;
 import java.util.List;
 
 public class ChoseAppsActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -63,6 +66,7 @@ public class ChoseAppsActivity extends Activity implements LoaderManager.LoaderC
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         return new CursorLoader(this, DBContentProvider.CONTENT_URI, new String[] {
                 StatisticTable.COLUMN_ID,
+                StatisticTable.COLUMN_ACTIVITY_NAME,
                 StatisticTable.COLUMN_APP_NAME,
                 StatisticTable.COLUMN_IGNORE},
                 null, null, StatisticTable.COLUMN_APP_NAME);
@@ -121,14 +125,11 @@ public class ChoseAppsActivity extends Activity implements LoaderManager.LoaderC
 
             int progress = 1;
             Cursor c = getContentResolver().query(DBContentProvider.CONTENT_URI,
-                    new String[]{StatisticTable.COLUMN_PACKAGE_NAME,
-                            StatisticTable.COLUMN_APP_NAME,
-                            StatisticTable.COLUMN_IGNORE}, null, null, null);
+                    new String[]{StatisticTable.COLUMN_ACTIVITY_NAME}, null, null, null);
             if (c.moveToFirst()) {
                 do {
                     for (int i = 0; i < activities.size(); i++) {
-                        if (activities.get(i).activityInfo.applicationInfo.packageName.equals(c.getString(c.getColumnIndex(StatisticTable.COLUMN_PACKAGE_NAME))) &
-                                activities.get(i).loadLabel(getPackageManager()).toString().equals(c.getString(c.getColumnIndex(StatisticTable.COLUMN_APP_NAME)))) {
+                        if (activities.get(i).activityInfo.name.equals(c.getString(c.getColumnIndex(StatisticTable.COLUMN_ACTIVITY_NAME)))) {
                             activities.remove(i);
                             publishProgress(progress);
                             progress++;
@@ -139,13 +140,18 @@ public class ChoseAppsActivity extends Activity implements LoaderManager.LoaderC
                 } while (c.moveToNext());
                 c.close();
             }
+
             for (ResolveInfo ri : activities) {
                 values.put(StatisticTable.COLUMN_PACKAGE_NAME, ri.activityInfo.applicationInfo.packageName);
+                values.put(StatisticTable.COLUMN_ACTIVITY_NAME, ri.activityInfo.name);
                 values.put(StatisticTable.COLUMN_APP_NAME, ri.loadLabel(getPackageManager()).toString());
                 values.put(StatisticTable.COLUMN_USAGE, 0);
                 values.put(StatisticTable.COLUMN_IGNORE, 1);
                 getContentResolver().insert(DBContentProvider.CONTENT_URI, values);
                 values.clear();
+
+                Utils.createIcon(context, ri);
+
                 publishProgress(progress);
                 progress++;
             }

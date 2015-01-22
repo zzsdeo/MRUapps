@@ -22,26 +22,42 @@ public class DBUpdateIntentService extends IntentService {
     protected void onHandleIntent(Intent intent) {
 
         if (intent.getAction().equals(LAUNCH_ACTION)) {
-            ResolveInfo appInfo = intent.getParcelableExtra(Widget.PARCELABLE_EXTRA);
+            int viewIndex = intent.getIntExtra(Widget.EXTRA_ITEM, 0);
+            Cursor c = getContentResolver().query(DBContentProvider.CONTENT_URI, new String []
+                            {StatisticTable.COLUMN_PACKAGE_NAME,
+                            StatisticTable.COLUMN_ACTIVITY_NAME,
+                            StatisticTable.COLUMN_USAGE},
+                            StatisticTable.COLUMN_IGNORE + " = " + 0,
+                            null, StatisticTable.COLUMN_USAGE + " DESC, " + StatisticTable.COLUMN_APP_NAME);
 
-            Cursor c = getContentResolver().query(DBContentProvider.CONTENT_URI, new String[]{StatisticTable.COLUMN_USAGE,
-                    StatisticTable.COLUMN_ID},
-                    StatisticTable.COLUMN_PACKAGE_NAME + " like " + "'" + appInfo.activityInfo.applicationInfo.packageName + "'" +
-                    " and " + StatisticTable.COLUMN_APP_NAME + " like " + "'" + appInfo.loadLabel(getPackageManager()).toString() + "'",
-                    null, null);
-            ContentValues values = new ContentValues();
-            if (c.moveToFirst()) {
+            if (c.moveToPosition(viewIndex)) {
+                String activityName = c.getString(c.getColumnIndex(StatisticTable.COLUMN_ACTIVITY_NAME));
+                Intent launchIntent = new Intent(Intent.ACTION_MAIN);
+                launchIntent.setClassName(c.getString(c.getColumnIndex(StatisticTable.COLUMN_PACKAGE_NAME)), activityName);
+                launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(launchIntent);
+
                 int usage = c.getInt(c.getColumnIndex(StatisticTable.COLUMN_USAGE));
-                long id = c.getLong(c.getColumnIndex(StatisticTable.COLUMN_ID));
+                ContentValues values = new ContentValues();
                 usage++;
                 values.put(StatisticTable.COLUMN_USAGE, usage);
-                getContentResolver().update(DBContentProvider.CONTENT_URI, values, StatisticTable.COLUMN_ID + " = " + id, null);
+                getContentResolver().update(DBContentProvider.CONTENT_URI, values, StatisticTable.COLUMN_ACTIVITY_NAME + " like " + "'" + activityName + "'", null);
             }
             c.close();
         }
 
         if (intent.getAction().equals(DELETE_PACKAGE_ACTION)) {
             String packageName = intent.getStringExtra(DeletePackageReceiver.PACKAGE_NAME_EXTRA);
+            Cursor c = getContentResolver().query(DBContentProvider.CONTENT_URI,
+                    new String[] {StatisticTable.COLUMN_ACTIVITY_NAME},
+                    StatisticTable.COLUMN_PACKAGE_NAME + " like " + "'" + packageName + "'",
+                    null, null);
+            if (c.moveToFirst()) {
+                do {
+                    Utils.deleteIcon(getApplicationContext(), c.getString(c.getColumnIndex(StatisticTable.COLUMN_ACTIVITY_NAME)));
+                } while (c.moveToNext());
+            }
+            c.close();
             getContentResolver().delete(DBContentProvider.CONTENT_URI, StatisticTable.COLUMN_PACKAGE_NAME + " like " + "'" + packageName + "'", null);
         }
 
