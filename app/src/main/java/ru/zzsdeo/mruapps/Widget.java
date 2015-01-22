@@ -5,11 +5,9 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ResolveInfo;
+import android.database.Cursor;
 import android.net.Uri;
 import android.widget.RemoteViews;
-
-import java.util.List;
 
 public class Widget extends AppWidgetProvider {
 
@@ -25,17 +23,23 @@ public class Widget extends AppWidgetProvider {
         if (intent.getAction().equals(CLICK_ACTION)) {
             //int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
             int viewIndex = intent.getIntExtra(EXTRA_ITEM, 0);
+            Cursor c = context.getContentResolver().query(DBContentProvider.CONTENT_URI,
+                    new String[] {StatisticTable.COLUMN_PACKAGE_NAME,
+                            StatisticTable.COLUMN_ACTIVITY_NAME},
+                    null, null, StatisticTable.COLUMN_USAGE + " DESC, " + StatisticTable.COLUMN_APP_NAME);
+
+            if (c.moveToPosition(viewIndex)) {
+                Intent launchIntent = new Intent(Intent.ACTION_MAIN);
+                launchIntent.setClassName(c.getString(c.getColumnIndex(StatisticTable.COLUMN_PACKAGE_NAME)), c.getString(c.getColumnIndex(StatisticTable.COLUMN_ACTIVITY_NAME)));
+                launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(launchIntent);
+            }
+            c.close();
+
             AppsCollection apps = new AppsCollection(context);
-            List<ResolveInfo> mruApps = apps.getMRUapps();
-
-            Intent launchIntent = new Intent(Intent.ACTION_MAIN);
-            launchIntent.setClassName(mruApps.get(viewIndex).activityInfo.applicationInfo.packageName, mruApps.get(viewIndex).activityInfo.name);
-            launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(launchIntent);
-
             Intent serviceIntent = new Intent(context, DBUpdateIntentService.class);
             serviceIntent.setAction(DBUpdateIntentService.LAUNCH_ACTION);
-            serviceIntent.putExtra(PARCELABLE_EXTRA, mruApps.get(viewIndex));
+            serviceIntent.putExtra(PARCELABLE_EXTRA, apps.getMRUapps().get(viewIndex));
             context.startService(serviceIntent);
         }
     }

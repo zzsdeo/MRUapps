@@ -141,6 +141,7 @@ public class ChoseAppsActivity extends Activity implements LoaderManager.LoaderC
             }
             for (ResolveInfo ri : activities) {
                 values.put(StatisticTable.COLUMN_PACKAGE_NAME, ri.activityInfo.applicationInfo.packageName);
+                values.put(StatisticTable.COLUMN_ACTIVITY_NAME, ri.activityInfo.name);
                 values.put(StatisticTable.COLUMN_APP_NAME, ri.loadLabel(getPackageManager()).toString());
                 values.put(StatisticTable.COLUMN_USAGE, 0);
                 values.put(StatisticTable.COLUMN_IGNORE, 1);
