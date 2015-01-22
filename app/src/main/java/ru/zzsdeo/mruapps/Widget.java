@@ -5,12 +5,8 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ResolveInfo;
-import android.database.Cursor;
 import android.net.Uri;
 import android.widget.RemoteViews;
-
-import java.util.List;
 
 public class Widget extends AppWidgetProvider {
 

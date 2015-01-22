@@ -13,14 +13,11 @@ import android.content.Intent;
 import android.content.Loader;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.ListView;
 
-import java.io.File;
 import java.util.List;
 
 public class ChoseAppsActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor> {

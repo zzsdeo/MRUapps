@@ -2,16 +2,10 @@ package ru.zzsdeo.mruapps;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ResolveInfo;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
-
-import java.io.File;
-import java.util.List;
 
 public class WidgetFactory implements RemoteViewsService.RemoteViewsFactory {
 
